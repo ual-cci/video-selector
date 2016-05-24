@@ -45,14 +45,17 @@ io.on( 'connection', function( socket ) {
 
 	socket.on( 'disconnect', function() {
 		console.log( 'Browser disconnected' );
+		serial.write( new Buffer( "e" ) );
 	} );
 
 	socket.on( 'playing', function( msg ) {
 		console.log( 'Playing: ' + msg );
+		serial.write( new Buffer( "p" + msg ) );
 	} );
 
 	socket.on( 'paused', function( msg ) {
 		console.log( 'Paused: ' + msg );
+		serial.write( new Buffer( "w" + msg ) );
 	} );
 
 	socket.on( 'stoped', function( msg ) {
