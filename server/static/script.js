@@ -28,8 +28,13 @@ window.onload = function() {
 			video.play();
 		}
 	} );
-	socket.on( 'pause', function( msg ) {
+
+	socket.on( 'pause', function() {
 		if ( current_video != null )
 			video.pause();
+	} );
+
+	socket.on( 'reload', function() {
+		location.reload();
 	} );
 }

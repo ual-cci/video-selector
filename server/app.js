@@ -12,6 +12,25 @@ app.get( '/', function( req, res ) {
 	res.sendFile( __dirname + '/views/index.html' );
 } );
 
+app.get( '/admin', function( req, res ) {
+	res.sendFile( __dirname + '/views/admin.html' );
+} );
+
+app.get( '/admin/reload', function( req, res ) {
+	io.emit( 'reload' );
+	res.redirect( '/admin?reloaded' );
+} )
+
+app.get( '/admin/play/:code', function( req, res ) {
+	io.emit( 'play', req.params.code );
+	res.redirect( '/admin?played' + req.params.code );
+} )
+
+app.get( '/admin/pause', function( req, res ) {
+	io.emit( 'pause' );
+	res.redirect( '/admin?paused' );
+} )
+
 app.use( '/static', express.static( 'static' ) );
 app.use( '/videos', express.static( 'videos' ) );
 
