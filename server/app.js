@@ -31,11 +31,17 @@ app.get( '/admin/pause', function( req, res ) {
 	res.redirect( '/admin?paused' );
 } )
 
+app.get( '/admin/stop', function( req, res ) {
+	io.emit( 'stop' );
+	res.redirect( '/admin?stopped' );
+} )
+
 app.use( '/static', express.static( 'static' ) );
 app.use( '/videos', express.static( 'videos' ) );
 
 io.on( 'connection', function( socket ) {
 	console.log( 'Browser connected' );
+	serial.write( new Buffer( "e" ) );
 
 	socket.on( 'disconnect', function() {
 		console.log( 'Browser disconnected' );
