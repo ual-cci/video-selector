@@ -55,8 +55,9 @@ io.on( 'connection', function( socket ) {
 		console.log( 'Paused: ' + msg );
 	} );
 
-	socket.on( 'ended', function( msg ) {
-		console.log( 'Ended' );
+	socket.on( 'stoped', function( msg ) {
+		console.log( 'Stopped' );
+		serial.write( new Buffer( "s" ) );
 	} );
 } );
 
