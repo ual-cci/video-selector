@@ -5,6 +5,7 @@ window.onload = function() {
 	video = document.getElementsByTagName('video')[0];
 
 	video.addEventListener( 'play', function() {
+		video.className = '';
 		socket.emit( 'playing', current_video );
 	} );
 
@@ -14,6 +15,7 @@ window.onload = function() {
 
 	video.addEventListener( 'ended', function() {
 		socket.emit( 'ended' );
+		video.className = 'hide';
 		current_video = null;
 	} );
 
