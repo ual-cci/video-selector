@@ -1,8 +1,8 @@
 #include <Metro.h>
 
-Metro buttonCheckTimer = Metro( 100 );
+Metro buttonCheckTimer = Metro( 50 );
 Metro pauseFlash = Metro( 250 );
-Metro playFlash = Metro( 500 );
+Metro playFlash = Metro( 1000 );
 
 #define numBtns 2
 
@@ -13,6 +13,7 @@ Metro playFlash = Metro( 500 );
 
 int state = OFFLINE;
 int focusLED = -1;
+boolean focusLEDstate = LOW;
 
 int buttons[] = { 2, 3 };
 int leds[] = { 13, 12 };
@@ -30,8 +31,10 @@ void loop() {
   // Check inputs
   if ( buttonCheckTimer.check() )
     for ( int i = 0; i < numBtns; i++ )
-      if ( ! digitalRead( buttons[i] ) )
-        Serial.println( padInt( i ) );
+      if ( ! digitalRead( buttons[i] ) ) {
+        Serial.println( padInt( i + 1 ) );
+        delay( 250 );
+      }
 
   // Handle modes for LEDs
   switch ( state ) {
@@ -44,18 +47,19 @@ void loop() {
         digitalWrite( leds[i], HIGH );
       break;
     case PLAYING:
-      for ( int i = 0; i < numBtns; i++ )
-        digitalWrite( leds[i], LOW );
+      if ( playFlash.check() ) focusLEDstate = ! focusLEDstate;
+      for ( int i = 0; i < numBtns; i++ ) digitalWrite( leds[i], i != focusLED ? LOW : focusLEDstate  );
       break;
     case PAUSED:
-      for ( int i = 0; i < numBtns; i++ )
-        digitalWrite( leds[i], LOW );
+      if ( pauseFlash.check() ) focusLEDstate = ! focusLEDstate;
+      for ( int i = 0; i < numBtns; i++ ) digitalWrite( leds[i], i != focusLED ? LOW : focusLEDstate  );
       break;
   }
   
   if ( Serial.available() ) {
     byte first_byte = Serial.read();
-
+    int ten, one;
+    
     switch ( first_byte ) {
       case 'O':
         state = OFFLINE;
@@ -65,13 +69,17 @@ void loop() {
         break;
       case 'P':
         state = PLAYING;
-        focusLED = 0;
-        if ( Serial.read() == '1' ) focusLED = 10;
-        focusLED += Serial.read();
-        Serial.println( focusLED );
+        while ( Serial.available() < 2 ) {}
+        ten = ( Serial.read() - '0' ) * 10;
+        one = Serial.read() - '0';
+        focusLED = ( ten + one ) - 1;
         break;
       case 'S':
         state = PAUSED;
+        while ( Serial.available() < 2 ) {}
+        ten = ( Serial.read() - '0' ) * 10;
+        one = Serial.read() - '0';
+        focusLED = ( ten + one ) - 1;
         break;
       
     }

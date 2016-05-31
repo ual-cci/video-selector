@@ -33,6 +33,8 @@ app.get( '/admin/pause', function( req, res ) {
 
 app.get( '/admin/stop', function( req, res ) {
 	io.emit( 'stop' );
+	console.log( 'Stopped' );
+	serial.write( new Buffer( "R" ) );
 	res.redirect( '/admin?stopped' );
 } )
 
@@ -41,26 +43,26 @@ app.use( '/videos', express.static( 'videos' ) );
 
 io.on( 'connection', function( socket ) {
 	console.log( 'Browser connected' );
-	serial.write( new Buffer( "e" ) );
+	serial.write( new Buffer( "R" ) );
 
 	socket.on( 'disconnect', function() {
 		console.log( 'Browser disconnected' );
-		serial.write( new Buffer( "e" ) );
+		serial.write( new Buffer( "O" ) );
 	} );
 
 	socket.on( 'playing', function( msg ) {
 		console.log( 'Playing: ' + msg );
-		serial.write( new Buffer( "p" + msg ) );
+		serial.write( new Buffer( "P" + msg ) );
 	} );
 
 	socket.on( 'paused', function( msg ) {
 		console.log( 'Paused: ' + msg );
-		serial.write( new Buffer( "w" + msg ) );
+		serial.write( new Buffer( "S" + msg ) );
 	} );
 
-	socket.on( 'stoped', function( msg ) {
+	socket.on( 'stopped', function( msg ) {
 		console.log( 'Stopped' );
-		serial.write( new Buffer( "s" ) );
+		serial.write( new Buffer( "R" ) );
 	} );
 } );
 

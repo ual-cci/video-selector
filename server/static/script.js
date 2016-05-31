@@ -65,11 +65,7 @@ window.onload = function() {
 
 	function pause() {
 		video.pause();
-		pauseTimeout = setTimeout( function() {
-			video.className = 'hide';
-			current_video = null;
-			socket.emit( 'ended' );
-		}, 1000 * 60 * 3 );
+		pauseTimeout = setTimeout( stop, 1000 * 60 * 3 );
 	}
 
 	function stop() {
@@ -77,6 +73,7 @@ window.onload = function() {
 		video.className = 'hide';
 		splash.className = '';
 		current_video = null;
+		socket.emit( 'stopped' );
 		clearTimeout( pauseTimeout );
 	}
 }
