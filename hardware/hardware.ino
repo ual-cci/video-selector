@@ -2,9 +2,8 @@
 
 Metro buttonCheckTimer = Metro( 50 );
 Metro pauseFlash = Metro( 250 );
-Metro playFlash = Metro( 1000 );
 
-#define numBtns 2
+#define numBtns 20
 
 #define OFFLINE 0
 #define READY 1
@@ -15,8 +14,9 @@ int state = OFFLINE;
 int focusLED = -1;
 boolean focusLEDstate = LOW;
 
-int buttons[] = { 2, 3 };
-int leds[] = { 13, 12 };
+//                01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+int buttons[] = { 53, 51, 49, 47, 45, 43, 41, 39, 37, 35, 33, 31, 29, 27, 25, 23, 21, 19, 17, 15 };
+int leds[] =    { 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14 };
 
 void setup() {
   Serial.begin( 115200 );
@@ -47,8 +47,7 @@ void loop() {
         digitalWrite( leds[i], HIGH );
       break;
     case PLAYING:
-      if ( playFlash.check() ) focusLEDstate = ! focusLEDstate;
-      for ( int i = 0; i < numBtns; i++ ) digitalWrite( leds[i], i != focusLED ? LOW : focusLEDstate  );
+      for ( int i = 0; i < numBtns; i++ ) digitalWrite( leds[i], i != focusLED ? LOW : HIGH );
       break;
     case PAUSED:
       if ( pauseFlash.check() ) focusLEDstate = ! focusLEDstate;
