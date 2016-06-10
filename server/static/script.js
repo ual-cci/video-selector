@@ -26,8 +26,8 @@ window.onload = function() {
 		} else {
 			if ( video.paused ) {
 				resume();
-			} else {
-				pause();
+			// } else {
+			// 	pause();
 			}
 		}
 	} );
