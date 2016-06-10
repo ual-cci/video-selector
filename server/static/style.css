@@ -2,7 +2,7 @@ body {
 	background: black;
 }
 
- video {
+video {
 	transition: opacity 0.5s;
 	position: absolute;
 	top: 0;
@@ -13,24 +13,8 @@ body {
 	height: 100%;
 	opacity: 1;
 	z-index: 100;
- }
+}
 
- video.hide {
-	 opacity: 0;
- }
-
- div {
-	 background: url( '/static/splash.jpg' ) no-repeat center;
-	 background-size: contain;
-	 transition: opacity 0.125s;
-	 opacity: 1;
-	 position: absolute;
-	 top: 0;
-	 left: 0;
-	 right: 0;
-	 bottom: 0;
- }
-
-div.hide {
+video.hide {
 	opacity: 0;
 }

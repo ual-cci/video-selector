@@ -3,8 +3,10 @@ var socket = io();
 var pauseTimeout;
 
 window.onload = function() {
-	video = document.getElementsByTagName('video')[0];
-	splash = document.getElementsByTagName('div')[0];
+	video = document.getElementById('playback');
+	splash = document.getElementById('splash');
+
+	splash.src = '/videos/splash.mov';
 
 	video.addEventListener( 'play', function() {
 		socket.emit( 'playing', current_video );
@@ -50,16 +52,23 @@ window.onload = function() {
 
 	function play() {
 		video.src = '/videos/' + current_video + '.mov';
+
 		video.play();
 		video.className = '';
+
+		splash.pause();
 		splash.className = 'hide';
+
 		clearTimeout( pauseTimeout );
 	}
 
 	function resume() {
 		video.play();
 		video.className = '';
+
+		splash.pause();
 		splash.className = 'hide';
+
 		clearTimeout( pauseTimeout );
 	}
 
@@ -71,7 +80,10 @@ window.onload = function() {
 	function stop() {
 		video.pause();
 		video.className = 'hide';
+
+		splash.play();
 		splash.className = '';
+
 		current_video = null;
 		socket.emit( 'stopped' );
 		clearTimeout( pauseTimeout );
