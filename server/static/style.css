@@ -43,7 +43,7 @@ video.hide {
 }
 
 #progress {
-	transition: width 2s;
+	transition: width .5s;
 	background: rgba( 255, 255, 255, 1 );
 	width: 0%;
 	height: 100%;
