@@ -38,8 +38,8 @@ app.get( '/admin/stop', function( req, res ) {
 	res.redirect( '/admin?stopped' );
 } )
 
-app.use( '/static', express.static( 'static' ) );
-app.use( '/videos', express.static( 'videos' ) );
+app.use( '/static', express.static( __dirname + '/static' ) );
+app.use( '/videos', express.static( __dirname + '/videos' ) );
 
 io.on( 'connection', function( socket ) {
 	console.log( 'Browser connected' );
