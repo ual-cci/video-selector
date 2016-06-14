@@ -26,11 +26,6 @@ app.get( '/admin/play/:code', function( req, res ) {
 	res.redirect( '/admin?played' + req.params.code );
 } )
 
-app.get( '/admin/pause', function( req, res ) {
-	io.emit( 'pause' );
-	res.redirect( '/admin?paused' );
-} )
-
 app.get( '/admin/stop', function( req, res ) {
 	io.emit( 'stop' );
 	console.log( 'Stopped' );
@@ -53,11 +48,6 @@ io.on( 'connection', function( socket ) {
 	socket.on( 'playing', function( msg ) {
 		console.log( 'Playing: ' + msg );
 		serial.write( new Buffer( "P" + msg ) );
-	} );
-
-	socket.on( 'paused', function( msg ) {
-		console.log( 'Paused: ' + msg );
-		serial.write( new Buffer( "S" + msg ) );
 	} );
 
 	socket.on( 'stopped', function( msg ) {

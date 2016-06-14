@@ -1,6 +1,5 @@
 var video, splash, current_video;
 var socket = io();
-var pauseTimeout;
 
 window.onload = function() {
 	video = document.getElementById('playback');
@@ -10,10 +9,6 @@ window.onload = function() {
 
 	video.addEventListener( 'play', function() {
 		socket.emit( 'playing', current_video );
-	} );
-
-	video.addEventListener( 'pause', function() {
-		socket.emit( 'paused', current_video );
 	} );
 
 	video.addEventListener( 'ended', function() {
@@ -30,19 +25,7 @@ window.onload = function() {
 			current_video = msg;
 			play();
 		} else {
-			if ( video.paused ) {
-				resume();
-			} else {
-				stop();
-			}
-		}
-	} );
-
-	socket.on( 'pause', function() {
-		if ( video.paused ) {
-			resume();
-		} else {
-			pause();
+			stop();
 		}
 	} );
 
@@ -64,8 +47,6 @@ window.onload = function() {
 
 		splash.pause();
 		splash.className = 'hide';
-
-		clearTimeout( pauseTimeout );
 	}
 
 	function resume() {
@@ -74,13 +55,6 @@ window.onload = function() {
 
 		splash.pause();
 		splash.className = 'hide';
-
-		clearTimeout( pauseTimeout );
-	}
-
-	function pause() {
-		video.pause();
-		pauseTimeout = setTimeout( stop, 1000 * 60 * 3 );
 	}
 
 	function stop() {
@@ -94,6 +68,5 @@ window.onload = function() {
 
 		current_video = null;
 		socket.emit( 'stopped' );
-		clearTimeout( pauseTimeout );
 	}
 }
