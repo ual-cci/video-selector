@@ -21,6 +21,8 @@ window.onload = function() {
 	} );
 
 	socket.on( 'play', function( msg ) {
+		console.log( msg );
+
 		if ( msg != current_video ) {
 			current_video = msg;
 			play();
@@ -38,7 +40,7 @@ window.onload = function() {
 	} );
 
 	function play() {
-		video.src = '/videos/' + current_video + '.mov';
+		video.src = '/videos/' + current_video;
 
 		video.play();
 		video.className = '';
