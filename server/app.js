@@ -12,7 +12,7 @@ var serialPort = require( 'serialport' );
 var SerialPort = serialPort.SerialPort;
 var serial;
 
-var __videos = '/Users/Tom/Desktop/videos';
+var __videos = '/Users/Shared/videos';
 var __static = __dirname + '/static';
 var __views = __dirname + '/views';
 
