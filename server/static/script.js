@@ -40,7 +40,12 @@ window.onload = function() {
 	} );
 
 	function play() {
+		video.pause();
+		video.src = '';
+		video.load();
+
 		video.src = '/videos/' + current_video;
+		video.load();
 
 		video.play();
 		video.className = '';

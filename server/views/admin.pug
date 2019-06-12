@@ -1,0 +1,12 @@
+extends base.pug
+
+block head
+	- title = 'Admin'
+
+block body
+	a(href='/admin/reload') Reload Remote Browser
+	h3 Playback
+	a(href='/admin/stop') Stop
+	ul
+		for video, i in videos
+			li: a(href=`/admin/play/${i}`)=video

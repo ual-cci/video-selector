@@ -1,0 +1,13 @@
+extends base.pug
+
+block head
+	- title = 'Video'
+	script(src='/socket.io/socket.io.js')
+	script(src='/static/script.js')
+	link(rel="stylesheet" href='/static/style.css')
+
+block body
+	video#splash(loop autoplay)
+	#bar.hide
+		#progress
+	video#playback.hide
