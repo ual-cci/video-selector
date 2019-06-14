@@ -5,7 +5,7 @@ window.onload = function() {
 	video = document.getElementById('playback');
 	splash = document.getElementById('splash');
 
-	splash.src = '/videos/splash.mov';
+	splash.src = '/videos/splash.mp4';
 
 	video.addEventListener( 'play', function() {
 		socket.emit( 'playing', current_video );

@@ -8,8 +8,8 @@ var express = require('express'),
 
 var io = require('socket.io')(http);
 
-var serialPort = require('serialport');
-var SerialPort = serialPort.SerialPort;
+var SerialPort = require('serialport');
+var Readline = require('@serialport/parser-readline');
 var serial;
 
 var __videos = '/Users/Shared/videos';
@@ -26,7 +26,7 @@ var videos = [];
 var files = fs.readdir(__videos, function(err, files) {
 	files.forEach(function(file) {
 		if (path.extname(file) === '.mp4' || path.extname(file) == '.mov') {
-			if (file != 'splash.mov')
+			if (file != 'splash.mp4')
 				videos.push(file);
 		}
 	});
@@ -84,22 +84,21 @@ io.on('connection', function(socket) {
 	});
 });
 
-serialPort.list(function (err, ports) {
+SerialPort.list(function (err, ports) {
 	ports.forEach(function(port) {
-		if (! serial && port.path.indexOf("cu.usb") != -1) {
-			console.log('\nConnecting to: "' + port.path + '"...');
-			serial = new SerialPort(port.path, {
-				baudrate: 115200,
-				praser: serialPort.parsers.readline('\n')
+		console.log(port.comName);
+		if (! serial && port.comName.indexOf("usbmodem") != -1) {
+			console.log('\nConnecting to: "' + port.comName + '"...');
+			serial = new SerialPort(port.comName, {
+				baudRate: 115200
 			});
-			serial.on('open', serialOpen);
+			const parser = new Readline();
+			serial.pipe(parser);
+
+			parser.on('data', serialData);
 		}
 	});
 });
-
-function serialOpen() {
-	serial.on('data', serialData);
-}
 
 function serialData(data) {
 	var index = parseInt(data.toString().trim());
