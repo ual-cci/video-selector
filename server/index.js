@@ -22,13 +22,19 @@ app.set('views', __views)
 app.set('view engine', 'pug')
 app.set('view cache', false)
 
-var videos = []
+let videos = []
+let captions = []
+
 console.log(process.env.VIDEOPATH)
 let files = fs.readdir(process.env.VIDEOPATH, (err, files) => {
 	files.forEach((file) => {
 		if (path.extname(file) === '.mp4' || path.extname(file) == '.mov') {
 			if (file != 'splash.mp4')
 				videos.push(file)
+		}
+		if (path.extname(file) === '.vtt' || path.extname(file) === '.webvtt' || path.extname(file) === '.srt') {
+			if (file != 'splash.vtt' && file != 'splash.webvtt' && file != 'splash.srt')
+				captions.push(file)
 		}
 	})
 })
@@ -50,7 +56,10 @@ app.get('/admin/reload', (req, res) => {
 })
 
 app.get('/admin/play/:code', (req, res) => {
-	io.emit('play', videos[req.params.code])
+	io.emit('play', {
+		video: videos[req.params.code],
+		caption: captions[req.params.code]
+	})
 	res.redirect('/admin?played=' + req.params.code)
 })
 

@@ -1,78 +1,117 @@
 const socket = io()
-let video
-let splash
+let body
 let current_video
+let current_caption
+let active_video
+let bar
 
 document.addEventListener('DOMContentLoaded', ready)
 
 function ready() {
-	video = document.getElementById('playback')
-	splash = document.getElementById('splash')
+	body = document.body;
+	stop() // show splash screen
 
-	splash.src = '/videos/splash.mp4'
-
-	video.addEventListener('play', () => {
-		socket.emit('playing', current_video)
-	})
-
-	video.addEventListener('ended', () => {
-		socket.emit('stopped')
-		stop()
-	})
-
-	video.addEventListener('timeupdate', () => {
-		document.getElementById( 'progress' ).style.width = (video.currentTime / video.duration) * 100 + "%"
-	})
-
-	socket.on('play', (msg) => {
-		console.log(msg)
-
-		if (msg != current_video) {
-			current_video = msg
-			play()
-		} else {
-			stop()
-		}
-	})
-
+	socket.on('play', playMsgHandler)
 	socket.on('stop', stop)
 	socket.on('reload', () => {location.reload()})
 }
 
 function play() {
-	video.pause()
-	video.src = ''
-	video.load()
-
-	video.src = '/videos/' + current_video
-	video.load()
-
+	const video = createVideoElement('/videos/' + current_video)
+	if (current_caption) createTrackElement(video, '/videos/' + current_caption)
 	video.play()
+
+	window.getComputedStyle(video).opacity // Force CSS to update so you can show the video
 	video.className = ''
 
-	document.getElementById('bar').className = ''
-
-	splash.pause()
-	splash.className = 'hide'
+	createBarElement()
+	bar.className = ''
+	active_video = video // This makes the progress bar point at the right thing
 }
 
-function resume() {
-	video.play()
-	video.className = ''
+function createVideoElement(videoSrc) {
+	// Schedule removal of existing video elements
+	Array.from(document.body.getElementsByTagName('video')).forEach(removeAfterTime)
 
-	splash.pause()
-	splash.className = 'hide'
+	// Create new video element
+	const video = document.createElement('video')
+	video.className = 'hide'
+	video.src = videoSrc
+	video.load()
+	video.addEventListener('play', playHandler)
+	video.addEventListener('ended', stopHandler)
+	video.addEventListener('timeupdate', timeUpdateHandler)
+	body.appendChild(video)
+	return video
+}
+
+function createTrackElement(video, trackSrc) {
+	const track = document.createElement('track')
+	video.appendChild(track)
+	track.kind = 'subtitles'
+	track.default = true
+	track.src = trackSrc
+	return track
+}
+
+function createBarElement() {
+	if (document.getElementById('bar')) document.getElementById('bar').remove()
+
+	const barElm = document.createElement('div')
+	barElm.id = 'bar'
+	barElm.className = 'hide'
+	
+	const progress = document.createElement('div')
+	progress.id = 'progress'
+	barElm.appendChild(progress)
+
+	bar = barElm
+	document.body.appendChild(barElm)
+	return barElm
+}
+
+function removeAfterTime(elm) {
+	elm.muted = true
+	setTimeout(() => {
+		elm.remove()
+	}, 500)
 }
 
 function stop() {
-	video.pause()
-	video.className = 'hide'
+	const video = createVideoElement('/videos/splash.mp4')
+	createTrackElement(video, '/videos/splash.vtt')
+	video.play()
+	video.loop = true
 
-	document.getElementById('bar').className = 'hide'
+	window.getComputedStyle(video).opacity // Force CSS to update so you can show the video
+	video.className = ''
 
-	splash.play()
-	splash.className = ''
+	if (bar) {
+		bar.className = 'hide'
+		setTimeout(() => {bar.remove()}, 500)
+	}
+	active_video = null
+}
 
-	current_video = null
+function playMsgHandler(msg) {
+	if (msg != current_video) {
+		current_video = msg.video
+		current_caption = msg.caption
+		play()
+	} else {
+		stop()
+	}
+}
+
+function playHandler(e) {
+	socket.emit('playing', current_video)
+}
+
+function stopHandler(e) {
 	socket.emit('stopped')
+	stop()
+}
+
+function timeUpdateHandler(e) {
+	if (active_video) document.getElementById('progress').style.width = (active_video.currentTime / active_video.duration) * 100 + "%"
 }

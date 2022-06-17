@@ -18,6 +18,10 @@ video.hide {
 	opacity: 0;
 }
 
+video::cue {
+	font-size: 24pt;
+}
+
 #splash {
 	z-index: 100;
 }

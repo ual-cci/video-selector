@@ -2,3 +2,4 @@
 videos/*
 node_modules/*
 static/splash.jpg
+.env
