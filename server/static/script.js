@@ -35,13 +35,15 @@ function createVideoElement(videoSrc) {
 
 	// Create new video element
 	const video = document.createElement('video')
+	video.addEventListener('playing', playHandler)
+	video.addEventListener('ended', stopHandler)
+	video.addEventListener('timeupdate', timeUpdateHandler)
+	
 	video.className = 'hide'
 	video.src = videoSrc
 	video.load()
-	video.addEventListener('play', playHandler)
-	video.addEventListener('ended', stopHandler)
-	video.addEventListener('timeupdate', timeUpdateHandler)
 	body.appendChild(video)
+	
 	return video
 }
 
@@ -80,6 +82,7 @@ function removeAfterTime(elm) {
 function stop() {
 	const video = createVideoElement('/videos/splash.mp4')
 	createTrackElement(video, '/videos/splash.vtt')
+	video.dataset.splash = 'true'
 	video.play()
 	video.loop = true
 
@@ -94,6 +97,7 @@ function stop() {
 }
 
 function playMsgHandler(msg) {
+	console.log(msg)
 	if (msg != current_video) {
 		current_video = msg.video
 		current_caption = msg.caption
@@ -104,7 +108,7 @@ function playMsgHandler(msg) {
 }
 
 function playHandler(e) {
-	socket.emit('playing', current_video)
+	if (!e.target.dataset.splash) socket.emit('playing', current_video)
 }
 
 function stopHandler(e) {

@@ -112,7 +112,10 @@ SerialPort.list().then((ports) => {
 function serialData(data) {
 	let index = parseInt(data.toString().trim())
 	if (videos[ index - 1 ]) {
-		io.emit('play', videos[ index - 1 ])
+		io.emit('play', {
+			video: videos[index - 1],
+			caption: captions[index - 1]
+		})
 	}
 }
 
