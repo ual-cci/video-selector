@@ -27,3 +27,6 @@ Guide: https://support.mozilla.org/en-US/kb/block-autoplay
 - macOS: `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome  --autoplay-policy=no-user-gesture-required`
 
 Source: https://developer.chrome.com/blog/autoplay/#developer-switches
+
+## Converting SRT to VTT
+`ffmpeg -i file.srt file.vtt`

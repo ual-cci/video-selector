@@ -22,21 +22,31 @@ app.set('views', __views)
 app.set('view engine', 'pug')
 app.set('view cache', false)
 
-let videos = []
-let captions = []
+let videos = {} // {video: '', caption: ''}
+
+const video_exts = ['.mov', '.mp4']
+const caption_exts = ['.vtt', '.webvtt']
 
 console.log(process.env.VIDEOPATH)
 let files = fs.readdir(process.env.VIDEOPATH, (err, files) => {
 	files.forEach((file) => {
-		if (path.extname(file) === '.mp4' || path.extname(file) == '.mov') {
-			if (file != 'splash.mp4')
-				videos.push(file)
+		const file_path = path.parse(file)
+
+		if (video_exts.includes(file_path.ext) && file_path.name != 'splash') {
+			if (typeof videos[file_path.name] != 'object') {
+				videos[file_path.name] = {name: file_path.name}
+			}
+			videos[file_path.name].video = file
 		}
-		if (path.extname(file) === '.vtt' || path.extname(file) === '.webvtt' || path.extname(file) === '.srt') {
-			if (file != 'splash.vtt' && file != 'splash.webvtt' && file != 'splash.srt')
-				captions.push(file)
+		if (caption_exts.includes(file_path.ext) && file_path.name != 'splash') {
+			if (typeof videos[file_path.name] != 'object') {
+				videos.push() = {name: file_path.name}
+			}
+			videos[file_path.name].caption = file
 		}
+		
 	})
+	console.log(videos)
 })
 
 app.use('/static', express.static(__static))
@@ -47,7 +57,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/admin', (req, res) => {
-	res.render('admin', {videos: videos})
+	res.render('admin', {videos: Object.values(videos)})
 })
 
 app.get('/admin/reload', (req, res) => {
@@ -56,10 +66,7 @@ app.get('/admin/reload', (req, res) => {
 })
 
 app.get('/admin/play/:code', (req, res) => {
-	io.emit('play', {
-		video: videos[req.params.code],
-		caption: captions[req.params.code]
-	})
+	io.emit('play', videos[req.params.code])
 	res.redirect('/admin?played=' + req.params.code)
 })
 
@@ -81,11 +88,8 @@ io.on('connection', (socket) => {
 	})
 
 	socket.on('playing', (msg) => {
-		let index = videos.indexOf(msg) + 1
-		index.toString()
-		if (index < 10) index = "0" + index
-		console.log('Playing: ' + index)
-		if (serial) serial.write(new Buffer("P" + index))
+		console.log('Playing: ' + msg)
+		if (serial) serial.write(new Buffer("P" + msg))
 	})
 
 	socket.on('stopped', (msg) => {

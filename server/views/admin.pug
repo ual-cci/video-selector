@@ -8,5 +8,5 @@ block body
 	h3 Playback
 	a(href='/admin/stop') Stop
 	ul
-		for video, i in videos
-			li: a(href=`/admin/play/${i}`)=video
+		for video in videos
+			li: a(href=`/admin/play/${video.name}`)=video.name

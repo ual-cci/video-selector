@@ -1,7 +1,6 @@
 const socket = io()
 let body
-let current_video
-let current_caption
+let current
 let active_video
 let bar
 
@@ -17,8 +16,8 @@ function ready() {
 }
 
 function play() {
-	const video = createVideoElement('/videos/' + current_video)
-	if (current_caption) createTrackElement(video, '/videos/' + current_caption)
+	const video = createVideoElement('/videos/' + current.video)
+	if (current.caption) createTrackElement(video, '/videos/' + current.caption)
 	video.play()
 
 	window.getComputedStyle(video).opacity // Force CSS to update so you can show the video
@@ -81,7 +80,7 @@ function removeAfterTime(elm) {
 
 function stop() {
 	const video = createVideoElement('/videos/splash.mp4')
-	createTrackElement(video, '/videos/splash.vtt')
+	createTrackElement(video, '/videos/splash.srt')
 	video.dataset.splash = 'true'
 	video.play()
 	video.loop = true
@@ -97,10 +96,8 @@ function stop() {
 }
 
 function playMsgHandler(msg) {
-	console.log(msg)
-	if (msg != current_video) {
-		current_video = msg.video
-		current_caption = msg.caption
+	if (msg != current) {
+		current = msg
 		play()
 	} else {
 		stop()
@@ -108,7 +105,8 @@ function playMsgHandler(msg) {
 }
 
 function playHandler(e) {
-	if (!e.target.dataset.splash) socket.emit('playing', current_video)
+	if (!e.target.dataset.splash) socket.emit('playing', current.name)
+	console.log('v: ', current.name)
 }
 
 function stopHandler(e) {
