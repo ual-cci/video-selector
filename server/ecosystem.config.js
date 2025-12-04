@@ -1,7 +1,7 @@
 module.exports = {
   apps : [{
     name: 'Video Selector',
-    script: 'index.js',
+    script: 'app.js',
     instances: 1,
     autorestart: true,
     watch: false,
