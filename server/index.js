@@ -210,12 +210,15 @@ function handleSerialDisconnection() {
 connectSerialPort()
 
 function serialData(data) {
-	let index = parseInt(data.toString().trim())
-	if (videos[ index - 1 ]) {
-		io.emit('play', {
-			video: videos[index - 1],
-			caption: captions[index - 1]
-		})
+	const index = parseInt(data.toString().trim())
+	
+	if (!isNaN(index) && index > 0) {
+		// Normalize to 2-digit padded string (e.g., "01", "02", etc.) to match Arduino format
+		const videoName = String(index).padStart(2, '0')
+		
+		if (videos[videoName]) {
+			io.emit('play', videos[videoName])
+		}
 	}
 }
 
