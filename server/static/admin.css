@@ -1,0 +1,95 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f5f5f5;
+	color: #333;
+	line-height: 1.6;
+	padding: 2rem;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+h1, h2, h3 {
+	font-weight: 600;
+	margin-bottom: 1rem;
+	color: #222;
+}
+
+h1 {
+	font-size: 2rem;
+	border-bottom: 2px solid #ddd;
+	padding-bottom: 0.5rem;
+	margin-bottom: 2rem;
+}
+
+h3 {
+	font-size: 1.5rem;
+	margin-top: 2rem;
+}
+
+a {
+	color: #0066cc;
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+a:hover {
+	color: #0052a3;
+	text-decoration: underline;
+}
+
+ul {
+	list-style: none;
+	margin: 1rem 0;
+}
+
+li {
+	margin: 0.5rem 0;
+	padding: 0.75rem;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+li:hover {
+	background-color: #f9f9f9;
+	border-color: #0066cc;
+}
+
+li a {
+	display: block;
+	font-size: 1rem;
+}
+
+a[href*="/admin/reload"],
+a[href*="/admin/stop"] {
+	display: inline-block;
+	padding: 0.75rem 1.5rem;
+	margin: 0.5rem 0.5rem 0.5rem 0;
+	background-color: #0066cc;
+	color: #fff;
+	border-radius: 4px;
+	font-weight: 500;
+	transition: background-color 0.2s ease;
+}
+
+a[href*="/admin/reload"]:hover,
+a[href*="/admin/stop"]:hover {
+	background-color: #0052a3;
+	text-decoration: none;
+}
+
+a[href*="/admin/stop"] {
+	background-color: #cc0000;
+}
+
+a[href*="/admin/stop"]:hover {
+	background-color: #a30000;
+}
+

@@ -11,8 +11,12 @@
     "serialport": "^10.4.0",
     "socket.io": "^4.4.1"
   },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
   "scripts": {
     "server": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
