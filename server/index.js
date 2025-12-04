@@ -30,8 +30,19 @@ let videos = {} // {video: '', caption: ''}
 const video_exts = ['.mov', '.mp4']
 const caption_exts = ['.vtt', '.webvtt']
 
-console.log(process.env.VIDEOPATH)
-let files = fs.readdir(process.env.VIDEOPATH, (err, files) => {
+if (!process.env.VIDEOPATH) {
+	console.error('ERROR: VIDEOPATH environment variable is not set!')
+	console.error('Please set VIDEOPATH in your .env file or environment variables.')
+	process.exit(1)
+}
+
+console.log('Video path:', process.env.VIDEOPATH)
+fs.readdir(process.env.VIDEOPATH, (err, files) => {
+	if (err) {
+		console.error('Error reading video directory:', err.message)
+		return
+	}
+	
 	files.forEach((file) => {
 		const file_path = path.parse(file)
 
