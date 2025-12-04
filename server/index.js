@@ -13,6 +13,9 @@ const io = require('socket.io')(http)
 const {SerialPort} = require('serialport')
 const {ReadlineParser} = require('@serialport/parser-readline')
 let serial
+let parser
+let reconnectInterval
+const RECONNECT_DELAY = 3000 // 3 seconds between reconnection attempts
 
 const __static = __dirname + '/static'
 const __views = __dirname + '/views'
@@ -40,13 +43,13 @@ let files = fs.readdir(process.env.VIDEOPATH, (err, files) => {
 		}
 		if (caption_exts.includes(file_path.ext) && file_path.name != 'splash') {
 			if (typeof videos[file_path.name] != 'object') {
-				videos.push() = {name: file_path.name}
+				videos[file_path.name] = {name: file_path.name}
 			}
 			videos[file_path.name].caption = file
 		}
 		
 	})
-	console.log(videos)
+	console.log('Loaded videos:', videos)
 })
 
 app.use('/static', express.static(__static))
@@ -98,20 +101,80 @@ io.on('connection', (socket) => {
 	})
 })
 
-SerialPort.list().then((ports) => {
-	ports.forEach((port) => {
-		if (!serial && port.manufacturer && port.manufacturer.includes("Arduino")) {
-			console.log('\nConnecting to: "' + port.path + '"...');
-			serial = new SerialPort({
-				path: port.path,
-				baudRate: 115200
-			})
+function connectSerialPort() {
+	// Don't attempt to connect if already connected or connecting
+	if (serial) {
+		return
+	}
 
-			parser = serial.pipe(new ReadlineParser())
-			parser.on('data', serialData);
+	SerialPort.list().then((ports) => {
+		let attemptedConnection = false
+		ports.forEach((port) => {
+			if (!serial && port.manufacturer && port.manufacturer.includes("Arduino")) {
+				console.log('\nConnecting to: "' + port.path + '"...');
+				attemptedConnection = true
+				try {
+					serial = new SerialPort({
+						path: port.path,
+						baudRate: 115200
+					})
+
+					parser = serial.pipe(new ReadlineParser())
+					parser.on('data', serialData);
+
+					serial.on('open', () => {
+						console.log('Serial port opened successfully');
+						// Clear any existing reconnect interval since we're connected
+						if (reconnectInterval) {
+							clearInterval(reconnectInterval)
+							reconnectInterval = null
+						}
+					})
+
+					serial.on('error', (err) => {
+						console.error('Serial port error:', err.message);
+						handleSerialDisconnection()
+					})
+
+					serial.on('close', () => {
+						console.log('Serial port closed');
+						handleSerialDisconnection()
+					})
+				} catch (err) {
+					console.error('Error creating serial port:', err.message);
+					handleSerialDisconnection()
+				}
+			}
+		})
+		
+		// If no Arduino device found and we don't have a connection, schedule a retry
+		if (!attemptedConnection && !serial) {
+			console.log('No Arduino device found. Will retry...');
+			if (!reconnectInterval) {
+				reconnectInterval = setInterval(connectSerialPort, RECONNECT_DELAY)
+			}
 		}
+	}).catch((err) => {
+		console.error('Error listing serial ports:', err.message);
+		handleSerialDisconnection()
 	})
-})
+}
+
+function handleSerialDisconnection() {
+	if (serial) {
+		serial = null
+		parser = null
+	}
+	
+	// Start reconnection attempts if not already running
+	if (!reconnectInterval) {
+		console.log(`Attempting to reconnect serial port in ${RECONNECT_DELAY/1000} seconds...`);
+		reconnectInterval = setInterval(connectSerialPort, RECONNECT_DELAY)
+	}
+}
+
+// Initial connection attempt
+connectSerialPort()
 
 function serialData(data) {
 	let index = parseInt(data.toString().trim())
