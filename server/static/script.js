@@ -80,7 +80,7 @@ function removeAfterTime(elm) {
 
 function stop() {
 	const video = createVideoElement('/videos/splash.mp4')
-	createTrackElement(video, '/videos/splash.srt')
+	createTrackElement(video, '/videos/splash.vtt')
 	video.dataset.splash = 'true'
 	video.play()
 	video.loop = true
