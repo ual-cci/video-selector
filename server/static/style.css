@@ -18,8 +18,8 @@ video.hide {
 	opacity: 0;
 }
 
-video::cue {
-	font-size: 24pt;
+video::-webkit-media-text-track-display {
+	transform: translateY(-1em);
 }
 
 #splash {
