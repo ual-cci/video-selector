@@ -37,30 +37,52 @@ if (!process.env.VIDEOPATH) {
 }
 
 console.log('Video path:', process.env.VIDEOPATH)
-fs.readdir(process.env.VIDEOPATH, (err, files) => {
-	if (err) {
-		console.error('Error reading video directory:', err.message)
-		return
-	}
-	
-	files.forEach((file) => {
-		const file_path = path.parse(file)
 
-		if (video_exts.includes(file_path.ext) && file_path.name != 'splash') {
-			if (typeof videos[file_path.name] != 'object') {
-				videos[file_path.name] = {name: file_path.name}
-			}
-			videos[file_path.name].video = file
-		}
-		if (caption_exts.includes(file_path.ext) && file_path.name != 'splash') {
-			if (typeof videos[file_path.name] != 'object') {
-				videos[file_path.name] = {name: file_path.name}
-			}
-			videos[file_path.name].caption = file
+function loadVideos() {
+	fs.readdir(process.env.VIDEOPATH, (err, files) => {
+		if (err) {
+			console.error('Error reading video directory:', err.message)
+			return
 		}
 		
+		// Reset videos object
+		videos = {}
+		
+		files.forEach((file) => {
+			const file_path = path.parse(file)
+
+			if (video_exts.includes(file_path.ext) && file_path.name != 'splash') {
+				if (typeof videos[file_path.name] != 'object') {
+					videos[file_path.name] = {name: file_path.name}
+				}
+				videos[file_path.name].video = file
+			}
+			if (caption_exts.includes(file_path.ext) && file_path.name != 'splash') {
+				if (typeof videos[file_path.name] != 'object') {
+					videos[file_path.name] = {name: file_path.name}
+				}
+				videos[file_path.name].caption = file
+			}
+			
+		})
+		console.log('Loaded videos:', videos)
 	})
-	console.log('Loaded videos:', videos)
+}
+
+// Initial load
+loadVideos()
+
+// Watch for changes in the video directory
+let reloadTimeout
+fs.watch(process.env.VIDEOPATH, (eventType, filename) => {
+	if (filename) {
+		// Debounce reload to avoid multiple rapid reloads
+		clearTimeout(reloadTimeout)
+		reloadTimeout = setTimeout(() => {
+			console.log(`Video directory changed (${eventType}: ${filename}). Reloading videos...`)
+			loadVideos()
+		}, 500) // Wait 500ms after last change before reloading
+	}
 })
 
 app.use('/static', express.static(__static))
